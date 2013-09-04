@@ -97,7 +97,7 @@ public class AuthenticationDatabase {
    public static class Serializer implements JsonDeserializer<AuthenticationDatabase>, JsonSerializer<AuthenticationDatabase> {
 
       public AuthenticationDatabase deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-         TypeToken token = new TypeToken() {
+         TypeToken<Object> token = new TypeToken<Object>() {
          };
          HashMap services = new HashMap();
          Map credentials = (Map)context.deserialize(json, token.getType());
