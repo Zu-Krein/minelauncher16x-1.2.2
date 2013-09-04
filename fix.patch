@@ -1,0 +1,303 @@
+diff -Naur /home/caver/mine/Launcher/1.2.2/src/net/minecraft/hopper/HopperService.java net/minecraft/hopper/HopperService.java
+--- /home/caver/mine/Launcher/1.2.2/src/net/minecraft/hopper/HopperService.java	2013-09-04 10:55:24.373516186 +0700
++++ net/minecraft/hopper/HopperService.java	2013-09-04 10:55:56.986342913 +0700
+@@ -53,7 +53,7 @@
+       return (PublishResponse)makeRequest(proxy, ROUTE_PUBLISH, request, PublishResponse.class);
+    }
+ 
+-   private static <T extends Response> T makeRequest(Proxy proxy, URL url, Object input, Class<T> classOfT) throws IOException {
++   private static <T extends Response> Response makeRequest(Proxy proxy, URL url, Object input, Class<T> classOfT) throws IOException {
+       String jsonResult = Util.performPost(url, GSON.toJson(input), proxy, "application/json", true);
+       Response result = (Response)GSON.fromJson(jsonResult, classOfT);
+       if(result == null) {
+diff -Naur /home/caver/mine/Launcher/1.2.2/src/net/minecraft/launcher/authentication/AuthenticationDatabase.java net/minecraft/launcher/authentication/AuthenticationDatabase.java
+--- /home/caver/mine/Launcher/1.2.2/src/net/minecraft/launcher/authentication/AuthenticationDatabase.java	2013-09-04 10:55:24.329515070 +0700
++++ net/minecraft/launcher/authentication/AuthenticationDatabase.java	2013-09-04 10:55:56.934341595 +0700
+@@ -125,7 +125,7 @@
+ 
+          return context.serialize(credentials);
+       }
+-
++/*
+       // $FF: synthetic method
+       // $FF: bridge method
+       public Object deserialize(JsonElement x0, Type x1, JsonDeserializationContext x2) throws JsonParseException {
+@@ -136,6 +136,6 @@
+       // $FF: bridge method
+       public JsonElement serialize(Object x0, Type x1, JsonSerializationContext x2) {
+          return this.serialize((AuthenticationDatabase)x0, x1, x2);
+-      }
++      }*/
+    }
+ }
+diff -Naur /home/caver/mine/Launcher/1.2.2/src/net/minecraft/launcher/authentication/AuthenticationSerializer.java net/minecraft/launcher/authentication/AuthenticationSerializer.java
+--- /home/caver/mine/Launcher/1.2.2/src/net/minecraft/launcher/authentication/AuthenticationSerializer.java	2013-09-04 10:55:24.325514970 +0700
++++ net/minecraft/launcher/authentication/AuthenticationSerializer.java	2013-09-04 10:55:56.930341495 +0700
+@@ -28,7 +28,7 @@
+       Map map = src.saveForStorage();
+       return map != null && !map.isEmpty()?context.serialize(map):null;
+    }
+-
++/*
+    // $FF: synthetic method
+    // $FF: bridge method
+    public JsonElement serialize(Object x0, Type x1, JsonSerializationContext x2) {
+@@ -39,5 +39,5 @@
+    // $FF: bridge method
+    public Object deserialize(JsonElement x0, Type x1, JsonDeserializationContext x2) throws JsonParseException {
+       return this.deserialize(x0, x1, x2);
+-   }
++   }*/
+ }
+diff -Naur /home/caver/mine/Launcher/1.2.2/src/net/minecraft/launcher/authentication/yggdrasil/YggdrasilAuthenticationService.java net/minecraft/launcher/authentication/yggdrasil/YggdrasilAuthenticationService.java
+--- /home/caver/mine/Launcher/1.2.2/src/net/minecraft/launcher/authentication/yggdrasil/YggdrasilAuthenticationService.java	2013-09-04 10:55:24.325514970 +0700
++++ net/minecraft/launcher/authentication/yggdrasil/YggdrasilAuthenticationService.java	2013-09-04 10:55:56.926341394 +0700
+@@ -103,7 +103,7 @@
+       }
+    }
+ 
+-   protected <T extends Response> T makeRequest(URL url, Object input, Class<T> classOfT) throws AuthenticationException {
++   protected <T extends Response> Response makeRequest(URL url, Object input, Class<T> classOfT) throws AuthenticationException {
+       try {
+          String e = Util.performPost(url, this.gson.toJson(input), Launcher.getInstance().getProxy(), "application/json", true);
+          Response result = (Response)this.gson.fromJson(e, classOfT);
+diff -Naur /home/caver/mine/Launcher/1.2.2/src/net/minecraft/launcher/GameLauncher.java net/minecraft/launcher/GameLauncher.java
+--- /home/caver/mine/Launcher/1.2.2/src/net/minecraft/launcher/GameLauncher.java	2013-09-04 10:55:24.317514768 +0700
++++ net/minecraft/launcher/GameLauncher.java	2013-09-04 10:55:56.922341292 +0700
+@@ -4,6 +4,7 @@
+ import java.io.BufferedOutputStream;
+ import java.io.BufferedReader;
+ import java.io.File;
++import java.io.FileFilter;
+ import java.io.FileInputStream;
+ import java.io.FileOutputStream;
+ import java.io.IOException;
+@@ -345,6 +346,7 @@
+       }
+    }
+ 
++   /*
+    private void cleanOldNatives() {
+       File root = new File(this.launcher.getWorkingDirectory(), "versions/");
+       this.launcher.println("Looking for old natives to clean up...");
+@@ -358,6 +360,28 @@
+          int len$1 = arr$1.length;
+ 
+          for(int i$1 = 0; i$1 < len$1; ++i$1) {
++            File folder = arr$1[i$1];
++            Launcher.getInstance().println("Deleting " + folder);
++            FileUtils.deleteQuietly(folder);
++         }
++      }
++
++   }
++*/
++      private void cleanOldNatives() {
++      File root = new File(this.launcher.getWorkingDirectory(), "versions/");
++      this.launcher.println("Looking for old natives to clean up...");
++      AgeFileFilter ageFilter = new AgeFileFilter(System.currentTimeMillis() - 3600L);
++      File[] arr$;
++        arr$ = root.listFiles((FileFilter)DirectoryFileFilter.DIRECTORY);
++      int len$ = arr$.length;
++
++      for(int i$ = 0; i$ < len$; ++i$) {
++         File version = arr$[i$];
++         File[] arr$1 = version.listFiles((FileFilter)FileFilterUtils.and(new IOFileFilter[]{new PrefixFileFilter(version.getName() + "-natives-"), ageFilter}));
++         int len$1 = arr$1.length;
++
++         for(int i$1 = 0; i$1 < len$1; ++i$1) {
+             File folder = arr$1[i$1];
+             Launcher.getInstance().println("Deleting " + folder);
+             FileUtils.deleteQuietly(folder);
+diff -Naur /home/caver/mine/Launcher/1.2.2/src/net/minecraft/launcher/process/LimitedCapacityList.java net/minecraft/launcher/process/LimitedCapacityList.java
+--- /home/caver/mine/Launcher/1.2.2/src/net/minecraft/launcher/process/LimitedCapacityList.java	2013-09-04 10:55:24.349515579 +0700
++++ net/minecraft/launcher/process/LimitedCapacityList.java	2013-09-04 10:55:56.954342103 +0700
+@@ -6,7 +6,7 @@
+ 
+ public class LimitedCapacityList<T extends Object> {
+ 
+-   private final T[] items;
++   private final Object[] items;
+    private final Class<? extends T> clazz;
+    private final ReadWriteLock locks = new ReentrantReadWriteLock();
+    private int size;
+@@ -44,7 +44,7 @@
+       return result;
+    }
+ 
+-   public T[] getItems() {
++   public Object[] getItems() {
+       Object[] result = (Object[])((Object[])Array.newInstance(this.clazz, this.size));
+       this.locks.readLock().lock();
+ 
+diff -Naur /home/caver/mine/Launcher/1.2.2/src/net/minecraft/launcher/Starter.java net/minecraft/launcher/Starter.java
+--- /home/caver/mine/Launcher/1.2.2/src/net/minecraft/launcher/Starter.java	1970-01-01 07:00:00.000000000 +0700
++++ net/minecraft/launcher/Starter.java	2013-09-04 10:55:56.898340683 +0700
+@@ -0,0 +1,52 @@
++package net.minecraft.launcher;
++
++import java.awt.Font;
++import java.io.File;
++import java.net.Proxy;
++
++import javax.swing.JFrame;
++import javax.swing.JScrollPane;
++import javax.swing.JTextArea;
++import javax.swing.text.DefaultCaret;
++
++public class Starter extends JFrame
++{
++	private static final Font MONOSPACED = new Font("Monospaced", 0, 12);
++	  private final JTextArea textArea;
++	  private final JScrollPane scrollPane;
++	 /**
++	 *
++	 */
++	public Starter()
++	{
++		super("Minecraft Launcher");
++
++	    setSize(854, 480);
++	    setDefaultCloseOperation(3);
++
++	    this.textArea = new JTextArea();
++	    this.textArea.setLineWrap(true);
++	    this.textArea.setEditable(false);
++	    this.textArea.setFont(MONOSPACED);
++	    ((DefaultCaret)this.textArea.getCaret()).setUpdatePolicy(1);
++
++	    this.scrollPane = new JScrollPane(this.textArea);
++	    this.scrollPane.setBorder(null);
++	    this.scrollPane.setVerticalScrollBarPolicy(22);
++
++	    add(this.scrollPane);
++	    setLocationRelativeTo(null);
++	    setVisible(true);
++	    File workdir = new File("/home/caver/.l121");
++
++	    if(!workdir.exists())
++	    	workdir.mkdir();
++
++		 new Launcher(this, workdir, Proxy.NO_PROXY, null, new String[]{"-Xmx1G"}, 6);
++
++	}
++	public static void main(String[] args)
++	  {
++		new Starter();
++	  }
++}
+diff -Naur /home/caver/mine/Launcher/1.2.2/src/net/minecraft/launcher/ui/popups/login/LogInForm.java net/minecraft/launcher/ui/popups/login/LogInForm.java
+--- /home/caver/mine/Launcher/1.2.2/src/net/minecraft/launcher/ui/popups/login/LogInForm.java	2013-09-04 10:55:24.357515781 +0700
++++ net/minecraft/launcher/ui/popups/login/LogInForm.java	2013-09-04 10:55:56.962342306 +0700
+@@ -111,7 +111,7 @@
+    public void tryLogIn() {
+       if(this.authentication.isLoggedIn() && this.authentication.getSelectedProfile() == null && ArrayUtils.isNotEmpty(this.authentication.getAvailableProfiles())) {
+          this.popup.setCanLogIn(false);
+-         final GameProfile var6 = null;
++         GameProfile var6 = null;
+          GameProfile[] finalSelectedProfile = this.authentication.getAvailableProfiles();
+          int len$ = finalSelectedProfile.length;
+ 
+@@ -126,11 +126,11 @@
+          if(var6 == null) {
+             var6 = this.authentication.getAvailableProfiles()[0];
+          }
+-
++         final GameProfile profile = var6;
+          this.popup.getLauncher().getVersionManager().getExecutorService().execute(new Runnable() {
+             public void run() {
+                try {
+-                  LogInForm.this.authentication.selectGameProfile(var6);
++                  LogInForm.this.authentication.selectGameProfile(profile);
+                   LogInForm.this.popup.getLauncher().getProfileManager().getAuthDatabase().register(LogInForm.this.authentication.getSelectedProfile().getId(), LogInForm.this.authentication);
+                   LogInForm.this.popup.setLoggedIn(LogInForm.this.authentication.getSelectedProfile().getId());
+                } catch (InvalidCredentialsException var2) {
+@@ -169,12 +169,12 @@
+ 
+                         SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+-                              LogInForm.thisxx.usernameField.setEditable(false);
+-                              LogInForm.thisxxx.passwordField.setEditable(false);
+-                              LogInForm.thisxxxx.userDropdownPanel.setVisible(true);
+-                              LogInForm.thisxxxxx.popup.repack();
++                              LogInForm.this.usernameField.setEditable(false);
++                              LogInForm.this.passwordField.setEditable(false);
++                              LogInForm.this.userDropdownPanel.setVisible(true);
++                              LogInForm.this.popup.repack();
+                               LogInForm.this.popup.setCanLogIn(true);
+-                              LogInForm.thisx.passwordField.setText(StringUtils.repeat('*', passwordLength));
++                              LogInForm.this.passwordField.setText(StringUtils.repeat('*', passwordLength));
+                            }
+                         });
+                      } else {
+diff -Naur /home/caver/mine/Launcher/1.2.2/src/net/minecraft/launcher/updater/DateTypeAdapter.java net/minecraft/launcher/updater/DateTypeAdapter.java
+--- /home/caver/mine/Launcher/1.2.2/src/net/minecraft/launcher/updater/DateTypeAdapter.java	2013-09-04 10:55:24.333515171 +0700
++++ net/minecraft/launcher/updater/DateTypeAdapter.java	2013-09-04 10:55:56.938341697 +0700
+@@ -81,7 +81,7 @@
+          return result.substring(0, 22) + ":" + result.substring(22);
+       }
+    }
+-
++/*
+    // $FF: synthetic method
+    // $FF: bridge method
+    public JsonElement serialize(Object x0, Type x1, JsonSerializationContext x2) {
+@@ -92,5 +92,5 @@
+    // $FF: bridge method
+    public Object deserialize(JsonElement x0, Type x1, JsonDeserializationContext x2) throws JsonParseException {
+       return this.deserialize(x0, x1, x2);
+-   }
++   }*/
+ }
+diff -Naur /home/caver/mine/Launcher/1.2.2/src/net/minecraft/launcher/updater/ExceptionalThreadPoolExecutor.java net/minecraft/launcher/updater/ExceptionalThreadPoolExecutor.java
+--- /home/caver/mine/Launcher/1.2.2/src/net/minecraft/launcher/updater/ExceptionalThreadPoolExecutor.java	2013-09-04 10:55:24.341515377 +0700
++++ net/minecraft/launcher/updater/ExceptionalThreadPoolExecutor.java	2013-09-04 10:55:56.946341900 +0700
+@@ -44,7 +44,7 @@
+       return new ExceptionalThreadPoolExecutor.ExceptionalFutureTask(callable);
+    }
+ 
+-   public class ExceptionalFutureTask<T extends Object> extends FutureTask<T> {
++   public class ExceptionalFutureTask<T extends Object> extends FutureTask {
+ 
+       public ExceptionalFutureTask(Callable callable) {
+          super(callable);
+diff -Naur /home/caver/mine/Launcher/1.2.2/src/net/minecraft/launcher/updater/FileTypeAdapter.java net/minecraft/launcher/updater/FileTypeAdapter.java
+--- /home/caver/mine/Launcher/1.2.2/src/net/minecraft/launcher/updater/FileTypeAdapter.java	2013-09-04 10:55:24.341515377 +0700
++++ net/minecraft/launcher/updater/FileTypeAdapter.java	2013-09-04 10:55:56.950342001 +0700
+@@ -25,7 +25,7 @@
+          return null;
+       }
+    }
+-
++/*
+    // $FF: synthetic method
+    // $FF: bridge method
+    public Object read(JsonReader x0) throws IOException {
+@@ -36,5 +36,5 @@
+    // $FF: bridge method
+    public void write(JsonWriter x0, Object x1) throws IOException {
+       this.write(x0, (File)x1);
+-   }
++   }*/
+ }
+diff -Naur /home/caver/mine/Launcher/1.2.2/src/net/minecraft/launcher/updater/LowerCaseEnumTypeAdapterFactory.java net/minecraft/launcher/updater/LowerCaseEnumTypeAdapterFactory.java
+--- /home/caver/mine/Launcher/1.2.2/src/net/minecraft/launcher/updater/LowerCaseEnumTypeAdapterFactory.java	2013-09-04 10:55:24.345515478 +0700
++++ net/minecraft/launcher/updater/LowerCaseEnumTypeAdapterFactory.java	2013-09-04 10:55:56.954342103 +0700
+@@ -27,7 +27,7 @@
+             lowercaseToConstant.put(this.toLowercase(constant), constant);
+          }
+ 
+-         return new TypeAdapter() {
++         return new TypeAdapter<T>() {
+             public void write(JsonWriter out, T value) throws IOException {
+                if(value == null) {
+                   out.nullValue();
+@@ -41,7 +41,7 @@
+                   reader.nextNull();
+                   return null;
+                } else {
+-                  return lowercaseToConstant.get(reader.nextString());
++                  return (T) lowercaseToConstant.get(reader.nextString());
+                }
+             }
+          };
