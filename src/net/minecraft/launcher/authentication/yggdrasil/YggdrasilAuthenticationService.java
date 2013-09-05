@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.Map;
 import net.minecraft.hopper.Util;
 import net.minecraft.launcher.Launcher;
+import net.minecraft.launcher.LauncherConstants;
 import net.minecraft.launcher.authentication.BaseAuthenticationService;
 import net.minecraft.launcher.authentication.GameProfile;
 import net.minecraft.launcher.authentication.exceptions.AuthenticationException;
@@ -25,8 +26,8 @@ import org.apache.commons.lang3.StringUtils;
 public class YggdrasilAuthenticationService extends BaseAuthenticationService {
 
    private static final String BASE_URL = "https://authserver.mojang.com/";
-   private static final URL ROUTE_AUTHENTICATE = Util.constantURL("https://authserver.mojang.com/authenticate");
-   private static final URL ROUTE_REFRESH = Util.constantURL("https://authserver.mojang.com/refresh");
+   private static final URL ROUTE_AUTHENTICATE = Util.constantURL(LauncherConstants.ROUTE_AUTHENTICATE);
+   private static final URL ROUTE_REFRESH = Util.constantURL(LauncherConstants.ROUTE_REFRESH);
    private static final URL ROUTE_VALIDATE = Util.constantURL("https://authserver.mojang.com/validate");
    private static final URL ROUTE_INVALIDATE = Util.constantURL("https://authserver.mojang.com/invalidate");
    private static final URL ROUTE_SIGNOUT = Util.constantURL("https://authserver.mojang.com/signout");

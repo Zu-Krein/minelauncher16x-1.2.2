@@ -309,7 +309,7 @@ public class Launcher {
 
    protected void initializeFrame() {
       this.frame.getContentPane().removeAll();
-      this.frame.setTitle("Minecraft Launcher 1.2.2");
+      this.frame.setTitle(LauncherConstants.LAUNCHER_VERSION);
       this.frame.setPreferredSize(new Dimension(900, 580));
       this.frame.setDefaultCloseOperation(2);
       this.frame.addWindowListener(new WindowAdapter() {

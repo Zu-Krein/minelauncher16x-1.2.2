@@ -19,6 +19,7 @@ import javax.swing.SwingUtilities;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import net.minecraft.launcher.Launcher;
+import net.minecraft.launcher.LauncherConstants;
 import net.minecraft.launcher.OperatingSystem;
 import net.minecraft.launcher.events.RefreshedVersionsListener;
 import net.minecraft.launcher.updater.ExceptionalThreadPoolExecutor;
@@ -267,7 +268,7 @@ public class VersionManager {
          Proxy proxy = ((RemoteVersionList)this.remoteVersionList).getProxy();
          job.addDownloadables((Collection)version.getRequiredDownloadables(OperatingSystem.getCurrentPlatform(), proxy, baseDirectory, false));
          String jarFile = "versions/" + version.getId() + "/" + version.getId() + ".jar";
-         job.addDownloadables(new Downloadable[]{new Downloadable(proxy, new URL("https://s3.amazonaws.com/Minecraft.Download/" + jarFile), new File(baseDirectory, jarFile), false)});
+         job.addDownloadables(new Downloadable[]{new Downloadable(proxy, new URL(LauncherConstants.SERVER_DOWNLOAD_URL + jarFile), new File(baseDirectory, jarFile), false)});
          return job;
       }
    }

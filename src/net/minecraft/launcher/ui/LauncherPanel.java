@@ -6,6 +6,7 @@ import java.awt.GridBagLayout;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import net.minecraft.launcher.Launcher;
+import net.minecraft.launcher.LauncherConstants;
 import net.minecraft.launcher.ui.BottomBarPanel;
 import net.minecraft.launcher.ui.TexturedPanel;
 import net.minecraft.launcher.ui.tabs.LauncherTabPanel;
@@ -42,7 +43,7 @@ public class LauncherPanel extends JPanel {
 
    protected JPanel createLauncherInterface() {
       JPanel result = new JPanel(new BorderLayout());
-      this.tabPanel.getBlog().setPage("http://mcupdate.tumblr.com");
+      this.tabPanel.getBlog().setPage(LauncherConstants.NEWS_URL);
       JPanel topWrapper = new JPanel();
       topWrapper.setLayout(new BorderLayout());
       topWrapper.add(this.tabPanel, "Center");
